@@ -60,7 +60,6 @@ def get_llm_insight(head_defects: List[Dict]) -> Dict:
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=0.3,
         max_tokens=2000,
     )
 

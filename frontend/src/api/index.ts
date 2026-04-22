@@ -54,7 +54,6 @@ ${defectSummary}
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userPrompt },
       ],
-      temperature: 0.3,
       max_tokens: 2000,
     }),
   });
