@@ -15,7 +15,7 @@ def get_llm_insight(head_defects: List[Dict]) -> Dict:
     """
     api_key = os.environ.get("LLM_API_KEY")
     base_url = os.environ.get("LLM_BASE_URL")
-    model = os.environ.get("LLM_MODEL", "gpt-4o")
+    model = os.environ.get("LLM_MODEL", "claude-opus-4-7")
 
     if not api_key:
         raise ValueError("环境变量 LLM_API_KEY 未设置")
