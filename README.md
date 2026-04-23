@@ -48,8 +48,7 @@ defect-pareto-dashboard/
 │   ├── .env                        # 环境变量（已 gitignore）
 │   ├── .env.example                # 环境变量模板
 │   └── package.json
-├── start_backend.sh            # 后端启动脚本
-├── start_frontend.sh           # 前端启动脚本
+├── package.json                # 根目录脚本（一键安装 + 同时启动前后端）
 └── README.md
 ```
 
@@ -62,23 +61,16 @@ git clone https://github.com/zqshub/defect-pareto-dashboard.git
 cd defect-pareto-dashboard
 ```
 
-### 2. 安装依赖
+### 2. 安装依赖（一条命令）
 
-**前端：**
 ```bash
-cd frontend
 npm install
+npm run setup
 ```
 
-**后端（AI 智能归因需要）：**
-```bash
-cd backend
-pip install -r requirements.txt
-```
+`npm run setup` 会自动安装前端 npm 依赖 + 后端 Python 依赖。
 
-### 3. 配置 LLM API（只需一份配置）
-
-前后端共用 `frontend/.env` 一份配置：
+### 3. 配置 LLM API
 
 ```bash
 cd frontend
@@ -104,21 +96,17 @@ VITE_LLM_MODEL=gpt-4o
 | 月之暗面 Kimi | `https://api.moonshot.cn/v1` | `moonshot-v1-8k` |
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o`, `gpt-4-turbo` |
 
-### 4. 启动服务
+### 4. 启动服务（一条命令同时启动前后端）
 
-**启动后端：**
 ```bash
-cd backend
-python -m uvicorn app.main:app --reload --port 8000
-```
-
-**启动前端（新终端）：**
-```bash
-cd frontend
 npm run dev
 ```
 
-打开浏览器访问 `http://localhost:5173`
+前后端会自动并行启动：
+- 后端：`http://localhost:8000`
+- 前端：`http://localhost:5173`
+
+浏览器自动打开 `http://localhost:5173`
 
 ### 5. 使用看板
 
