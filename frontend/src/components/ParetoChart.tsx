@@ -52,7 +52,7 @@ const ParetoChart: React.FC<Props> = ({ categories }) => {
         name: '累计百分比 (%)',
         position: 'right',
         min: 0,
-        max: 105,
+        max: 100,
         axisLabel: { formatter: '{value}%' },
         splitLine: { show: false }
       }
@@ -109,7 +109,7 @@ const ParetoChart: React.FC<Props> = ({ categories }) => {
 
   return (
     <div className="w-full h-[420px]">
-      <ReactECharts option={option} style={{ height: '100%', width: '100%' }} />
+      <ReactECharts option={option} notMerge={true} style={{ height: '100%', width: '100%' }} />
     </div>
   )
 }

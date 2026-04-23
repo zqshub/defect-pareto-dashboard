@@ -27,14 +27,15 @@ export function analyzePareto(records: DefectRecord[], threshold: number = 0.80)
   const total = records.length;
 
   let cumulative = 0;
-  const categories: DefectCategory[] = sorted.map(([name, count]) => {
+  const categories: DefectCategory[] = sorted.map(([name, count], index) => {
     const pct = Math.round((count / total) * 10000) / 100;
     cumulative = Math.round((cumulative + pct) * 100) / 100;
+    const isLast = index === sorted.length - 1;
     return {
       name,
       count,
       percentage: pct,
-      cumulative,
+      cumulative: isLast ? 100 : Math.min(cumulative, 100),
     };
   });
 

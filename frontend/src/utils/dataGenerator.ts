@@ -6,13 +6,50 @@ export interface DefectRecord {
   AI置信度: number;
 }
 
-export function generateDefectData(count: number = 1000): DefectRecord[] {
+function generateRandomWeights(): number[] {
+  const weights = new Array(7).fill(0);
+
+  // 随机选择 2 种缺陷作为头部（合计占 65%-75%）
+  const indices = [0, 1, 2, 3, 4, 5, 6];
+  for (let i = indices.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [indices[i], indices[j]] = [indices[j], indices[i]];
+  }
+  const headIndices = indices.slice(0, 2);
+
+  // 头部缺陷合计占 68%-72%，严格贴近 70%，避免单一缺陷占比过高导致柱子顶满
+  const headTotal = Math.floor(Math.random() * 5) + 68;
+  const head1 = Math.floor(Math.random() * 9) + 32;
+  const head2 = headTotal - head1;
+
+  weights[headIndices[0]] = head1;
+  weights[headIndices[1]] = head2;
+
+  // 剩余 28%-32% 分配给其余 5 种缺陷，每种至少 5%
+  let remaining = 100 - headTotal;
+  const otherIndices = indices.slice(2);
+
+  for (let i = 0; i < otherIndices.length; i++) {
+    if (i === otherIndices.length - 1) {
+      weights[otherIndices[i]] = remaining;
+    } else {
+      const maxW = Math.min(9, remaining - (otherIndices.length - 1 - i) * 5);
+      const weight = Math.floor(Math.random() * (maxW - 5 + 1)) + 5;
+      weights[otherIndices[i]] = weight;
+      remaining -= weight;
+    }
+  }
+
+  return weights;
+}
+
+export function generateDefectData(count: number = 1200): DefectRecord[] {
   const productionLines = Array.from({ length: 10 }, (_, i) => `Line-${String(i + 1).padStart(2, '0')}`);
   const batches = Array.from({ length: 50 }, (_, i) => `Batch-${String(i + 1).padStart(4, '0')}`);
 
   const defectTypes = ['划伤', '异物', '脏污', '漏装', '变形', '色差', '裂纹'];
-  // 权重：划伤45%，异物28%，其余27%
-  const weights = [45, 28, 10, 7, 5, 3, 2];
+  // 每次生成随机轮换头部缺陷，模拟不同批次/产线的真实场景
+  const weights = generateRandomWeights();
   const totalWeight = weights.reduce((a, b) => a + b, 0);
   const probabilities = weights.map((w) => w / totalWeight);
 

@@ -10,6 +10,11 @@ export default defineConfig({
         target: 'http://localhost:8000',
         changeOrigin: true,
       },
+      '/llm-proxy': {
+        target: 'https://api.closeai-asia.com',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/llm-proxy/, ''),
+      },
     },
   },
 })

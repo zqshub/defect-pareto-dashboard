@@ -14,33 +14,32 @@ export async function getLLMInsight(headDefects: { name: string; count: number; 
     .map((d) => `- ${d.name}: ${d.count} 次，占比 ${d.percentage}%，累计 ${d.cumulative}%`)
     .join('\n');
 
-  const systemPrompt = `你是一位资深的工业品质管理专家，擅长产线缺陷分析与根因排查。
-请基于提供的缺陷帕累托分析数据，对头部缺陷（累计占比约80%的核心缺陷）进行智能归因分析。
+  const systemPrompt = `你是一位资深工艺工程师（10年以上制造现场经验），基于缺陷帕累托数据输出质量改善分析。
 
-你需要输出以下结构化内容（严格使用 JSON 格式）：
+【输出格式】JSON：
 {
-  "summary": "一段简洁的总体分析摘要（2-3句话）",
-  "root_causes": [
-    {"defect": "缺陷名称", "possible_causes": ["可能原因1", "可能原因2", "可能原因3"], "confidence": "高/中/低"}
-  ],
-  "recommendations": [
-    {"defect": "缺陷名称", "actions": ["排查建议1", "排查建议2"], "priority": "高/中/低"}
-  ],
-  "key_insight": "最重要的一个洞察（一句话）"
+  "summary": "2-3句话概述问题现状与风险",
+  "root_causes": [{"defect": "缺陷名", "possible_causes": ["原因1","原因2"], "confidence": "高/中/低"}],
+  "recommendations": [{"defect": "缺陷名", "actions": ["短期: ...","中期: ...","长期: ..."], "priority": "高/中/低"}],
+  "key_insight": "一句话核心洞察"
 }
 
-注意：
-1. 分析要具体、可落地，不要泛泛而谈。
-2. 原因要基于制造业常见场景（设备磨损、来料不良、工艺参数、人员操作、环境因素等）。
-3. 建议要有明确的执行步骤和检查方向。`;
+【分析要求】
+1. 聚焦头部缺陷（累计80%），按频次从高到低逐一分析。
+2. 根因：从工艺、设备、材料、治具、人员五个维度判断，每缺陷列2-3条最可能原因。
+3. 措施：每缺陷必须包含短期遏制、中期整改、长期预防各一条，标注责任部门（如生产/设备/质量/采购）。
+4. 语言：工程化表述，具体、可执行，禁止空话套话。每个字段控制在1-2句话。`;
 
-  const userPrompt = `以下是产线缺陷帕累托分析的头部缺陷数据（累计占比约80%）：
+  const userPrompt = `头部缺陷数据（累计80%，优先改善项）：
 
 ${defectSummary}
 
-请进行智能归因分析。`;
+请按上述格式输出归因分析。`;
 
-  const url = BASE_URL ? `${BASE_URL}/chat/completions` : 'https://api.openai.com/v1/chat/completions';
+  // 开发环境走 Vite 代理避免 CORS，生产环境直接请求
+  const url = import.meta.env.DEV
+    ? '/llm-proxy/v1/chat/completions'
+    : (BASE_URL ? `${BASE_URL}/chat/completions` : 'https://api.openai.com/v1/chat/completions');
 
   const res = await fetch(url, {
     method: 'POST',

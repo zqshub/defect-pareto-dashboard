@@ -20,8 +20,8 @@ const Dashboard = () => {
     setError(null)
     setInsight(null)
     try {
-      // 生成 1000 条模拟数据
-      const newRecords = generateDefectData(1000)
+      // 生成 1200 条模拟数据
+      const newRecords = generateDefectData(1200)
       setRecords(newRecords)
 
       // 帕累托分析
@@ -158,7 +158,7 @@ const Dashboard = () => {
           <div className="bg-white rounded-lg shadow p-12">
             <div className="text-6xl mb-4">&#128202;</div>
             <h2 className="text-lg font-semibold text-gray-800 mb-2">欢迎使用产线缺陷分析看板</h2>
-            <p className="text-gray-500 mb-6">点击「生成模拟数据」按钮生成 1000 条缺陷记录并开始帕累托分析</p>
+            <p className="text-gray-500 mb-6">点击「生成模拟数据」按钮生成 1200 条缺陷记录并开始帕累托分析</p>
             <button
               onClick={loadData}
               className="px-6 py-2.5 bg-primary text-white rounded-lg text-sm font-medium hover:bg-blue-700 transition-colors"
