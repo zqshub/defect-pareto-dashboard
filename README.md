@@ -59,11 +59,14 @@ npm install
 
 ### 3. 配置 LLM API
 
-```bash
-cp .env.example .env
-```
+将 `frontend/.env.example` 复制一份命名为 `.env`：
 
-编辑 `.env`，填入你的 API Key 和配置：
+- **macOS / Linux：** `cp .env.example .env`
+- **Windows PowerShell：** `Copy-Item .env.example .env`
+- **Windows CMD：** `copy .env.example .env`
+- **手动：** 直接复制文件并改名为 `.env`
+
+然后编辑 `.env`，填入你的 API Key 和配置：
 
 ```env
 VITE_LLM_API_KEY=sk-your-api-key-here
