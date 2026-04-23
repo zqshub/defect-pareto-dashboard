@@ -2,6 +2,18 @@ import os
 import json
 from typing import Dict, List
 from openai import OpenAI
+from dotenv import load_dotenv
+
+# 加载 .env 文件（支持后端目录和项目根目录）
+_base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+load_dotenv(os.path.join(_base_dir, ".env"))
+_proj_root = os.path.dirname(_base_dir)
+load_dotenv(os.path.join(_proj_root, ".env"))
+
+
+def _get_env(key: str, default: str = "") -> str:
+    """读取环境变量，兼容 VITE_ 前缀（前端配置）"""
+    return os.environ.get(key) or os.environ.get(f"VITE_{key}") or default
 
 
 def get_llm_insight(head_defects: List[Dict]) -> Dict:
@@ -13,9 +25,9 @@ def get_llm_insight(head_defects: List[Dict]) -> Dict:
     - LLM_BASE_URL: API Base URL（如 https://api.openai.com/v1）
     - LLM_MODEL: 模型名称（如 gpt-4o）
     """
-    api_key = os.environ.get("LLM_API_KEY")
-    base_url = os.environ.get("LLM_BASE_URL")
-    model = os.environ.get("LLM_MODEL", "claude-opus-4-7")
+    api_key = _get_env("LLM_API_KEY")
+    base_url = _get_env("LLM_BASE_URL")
+    model = _get_env("LLM_MODEL", "claude-opus-4-7")
 
     if not api_key:
         raise ValueError("环境变量 LLM_API_KEY 未设置")

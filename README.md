@@ -6,7 +6,7 @@
 
 - **数据生成**：自动生成 1200 条模拟工业视觉检测缺陷记录 CSV，每次头部缺陷类型随机轮换
 - **帕累托分析**：统计缺陷频次，计算累计百分比，提取头部缺陷（累计 80%）
-- **可视化看板**：ECharts 标准帕累托图（柱状图 + 累计百分比折线图）
+- **可视化看板**：ECharts 标准帕累托图（柱状图 + 累计百分比折线图）+ 数据明细表格 + 统计卡片
 - **AI 智能归因**：调用大模型对头部缺陷进行根因分析和排查建议，支持多种 LLM 平台
 - **数据导出**：一键下载缺陷记录 CSV 文件
 
@@ -15,14 +15,23 @@
 | 层级 | 技术 |
 |------|------|
 | 前端 | React 18 + TypeScript + Vite + Tailwind CSS + ECharts |
-| 数据模拟 | JavaScript（随机权重分配，模拟真实工业场景） |
+| 后端 | Python + FastAPI + Uvicorn |
+| 数据分析 | Pandas + NumPy |
 | LLM | OpenAI 兼容 API（支持 CloseAI / 硅基流动 / OpenAI 等平台） |
 
 ## 项目结构
 
 ```
 defect-pareto-dashboard/
-├── frontend/                   # React 前端（主运行方案）
+├── backend/                    # FastAPI 后端
+│   ├── app/
+│   │   ├── main.py             # FastAPI 主入口 & API 路由
+│   │   ├── llm_insight.py      # LLM 智能归因（兼容 VITE_ 前缀环境变量）
+│   │   ├── analyzer.py         # 帕累托分析算法
+│   │   └── data_generator.py   # 模拟数据生成
+│   ├── .env                    # 后端环境变量（API Key，已 gitignore）
+│   └── requirements.txt        # Python 依赖
+├── frontend/                   # React 前端
 │   ├── src/
 │   │   ├── utils/
 │   │   │   ├── dataGenerator.ts    # 数据生成（1200条，头部缺陷轮换）
@@ -30,15 +39,18 @@ defect-pareto-dashboard/
 │   │   ├── components/
 │   │   │   ├── ParetoChart.tsx     # 帕累托图
 │   │   │   ├── DefectTable.tsx     # 缺陷表格
-│   │   │   └── InsightPanel.tsx    # AI 分析面板
+│   │   │   └── InsightPanel.tsx    # AI 分析面板（卡片化 + 步骤化设计）
 │   │   ├── pages/
 │   │   │   └── Dashboard.tsx       # 看板页面
 │   │   ├── api/
-│   │   │   └── index.ts            # LLM API 调用
+│   │   │   └── index.ts            # API 调用封装
 │   │   └── types/
-│   │       └── index.ts            # TypeScript 类型
-│   ├── .env.example
+│   │       └── index.ts            # TypeScript 类型定义
+│   ├── .env                        # 前端环境变量（已 gitignore）
+│   ├── .env.example                # 环境变量模板
 │   └── package.json
+├── start_backend.sh            # 后端启动脚本
+├── start_frontend.sh           # 前端启动脚本
 └── README.md
 ```
 
@@ -48,31 +60,41 @@ defect-pareto-dashboard/
 
 ```bash
 git clone https://github.com/zqshub/defect-pareto-dashboard.git
-cd defect-pareto-dashboard/frontend
+cd defect-pareto-dashboard
 ```
 
 ### 2. 安装依赖
 
+**前端：**
 ```bash
+cd frontend
 npm install
+```
+
+**后端（可选，AI 智能归因需要）：**
+```bash
+cd backend
+pip install -r requirements.txt
 ```
 
 ### 3. 配置 LLM API
 
-将 `frontend/.env.example` 复制一份命名为 `.env`：
+前后端共用同一套 API 配置。最简单的方式是在后端目录创建 `.env` 文件：
 
-- **macOS / Linux：** `cp .env.example .env`
-- **Windows PowerShell：** `Copy-Item .env.example .env`
-- **Windows CMD：** `copy .env.example .env`
-- **手动：** 直接复制文件并改名为 `.env`
+```bash
+cd backend
+cp .env.example .env   # 如果没有 .env.example，直接手动创建
+```
 
-然后编辑 `.env`，填入你的 API Key 和配置：
+编辑 `backend/.env`：
 
 ```env
-VITE_LLM_API_KEY=sk-your-api-key-here
-VITE_LLM_BASE_URL=https://api.openai.com/v1
-VITE_LLM_MODEL=gpt-4o
+LLM_API_KEY=sk-your-api-key-here
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_MODEL=gpt-4o
 ```
+
+> 后端代码会自动加载 `backend/.env`，同时兼容前端的 `VITE_` 前缀变量名。你也可以把配置写在前端的 `.env` 里（带 `VITE_` 前缀），后端同样能读取。
 
 **常用平台配置参考：**
 
@@ -83,11 +105,17 @@ VITE_LLM_MODEL=gpt-4o
 | 月之暗面 Kimi | `https://api.moonshot.cn/v1` | `moonshot-v1-8k` |
 | OpenAI | `https://api.openai.com/v1` | `gpt-4o`, `gpt-4-turbo` |
 
-> 开发环境下，LLM 请求会通过 Vite 代理转发，避免浏览器 CORS 限制。
+### 4. 启动服务
 
-### 4. 启动开发服务器
-
+**启动后端：**
 ```bash
+cd backend
+python -m uvicorn app.main:app --reload --port 8000
+```
+
+**启动前端（新终端）：**
+```bash
+cd frontend
 npm run dev
 ```
 
@@ -96,9 +124,9 @@ npm run dev
 ### 5. 使用看板
 
 1. 点击「生成模拟数据」生成 1200 条缺陷记录
-2. 查看帕累托图和缺陷分布明细
+2. 查看帕累托图、缺陷分布明细和统计卡片
 3. 点击「下载 CSV」导出数据文件
-4. 点击「AI 智能归因」获取大模型分析结果
+4. 点击「AI 智能归因」获取大模型根因分析和排查建议
 
 ## 核心逻辑说明
 
@@ -106,7 +134,7 @@ npm run dev
 
 1. **统计频次**：遍历缺陷记录，按类别统计出现次数
 2. **降序排列**：按频次从高到低排序
-3. **计算百分比**：每个类别的数量 / 总数 × 100%
+3. **计算百分比**：每个类别的数量 / 总数 x 100%
 4. **计算累计百分比**：逐类累加百分比，最后一项强制为 100%
 5. **提取头部缺陷**：累计占比达到 80% 的缺陷类别
 
@@ -124,25 +152,12 @@ npm run dev
 
 ### LLM 智能归因 Prompt 设计
 
-System Prompt 要求模型扮演资深工艺工程师（10 年以上制造现场经验），基于头部缺陷数据输出结构化 JSON：
+System Prompt 要求模型扮演资深工艺工程师，基于头部缺陷数据输出结构化 JSON：
 
-- `summary`: 总体分析摘要（工程改善口吻，2-3 句话）
-- `root_causes`: 根因分析（工艺/设备/材料/治具/人员五维度，每种缺陷 2-3 条最可能原因 + 置信度）
-- `recommendations`: 排查建议（短期遏制、中期整改、长期预防各一条，标注责任部门与优先级）
-- `key_insight`: 核心洞察（一句话）
-
-### 前端代理配置
-
-开发环境下，Vite 配置了两条代理规则：
-
-- `/api` → `http://localhost:8000`（后端 API，如需要）
-- `/llm-proxy` → LLM API Base URL（解决浏览器 CORS 跨域限制）
-
-生产环境请确保 API 端点支持 CORS，或在 Nginx 等反向代理中配置跨域头。
-
-## 截图
-
-![看板预览](screenshot.png)
+- `summary`: 总体分析摘要（2-3 句话）
+- `root_causes`: 根因分析（每种缺陷 2-3 条最可能原因 + 置信度高/中/低）
+- `recommendations`: 排查建议（按优先级高/中/低排序，含具体行动步骤）
+- `key_insight`: 核心洞察（一句话，最关键的发现）
 
 ## License
 
