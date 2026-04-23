@@ -4,11 +4,10 @@ from typing import Dict, List
 from openai import OpenAI
 from dotenv import load_dotenv
 
-# 加载 .env 文件（支持后端目录和项目根目录）
+# 加载前端目录的 .env 文件（前后端共用一份配置）
 _base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-load_dotenv(os.path.join(_base_dir, ".env"))
 _proj_root = os.path.dirname(_base_dir)
-load_dotenv(os.path.join(_proj_root, ".env"))
+load_dotenv(os.path.join(_proj_root, "frontend", ".env"))
 
 
 def _get_env(key: str, default: str = "") -> str:

@@ -77,24 +77,24 @@ cd backend
 pip install -r requirements.txt
 ```
 
-### 3. 配置 LLM API
+### 3. 配置 LLM API（只需一份配置）
 
-前后端共用同一套 API 配置。最简单的方式是在后端目录创建 `.env` 文件：
+前后端共用 `frontend/.env` 一份配置：
 
 ```bash
-cd backend
-cp .env.example .env   # 如果没有 .env.example，直接手动创建
+cd frontend
+cp .env.example .env
 ```
 
-编辑 `backend/.env`：
+编辑 `frontend/.env`，填入你的 API Key：
 
 ```env
-LLM_API_KEY=sk-your-api-key-here
-LLM_BASE_URL=https://api.openai.com/v1
-LLM_MODEL=gpt-4o
+VITE_LLM_API_KEY=sk-your-api-key-here
+VITE_LLM_BASE_URL=https://api.openai.com/v1
+VITE_LLM_MODEL=gpt-4o
 ```
 
-> 后端代码会自动加载 `backend/.env`，同时兼容前端的 `VITE_` 前缀变量名。你也可以把配置写在前端的 `.env` 里（带 `VITE_` 前缀），后端同样能读取。
+> 后端会自动读取 `frontend/.env`，无需单独配置。
 
 **常用平台配置参考：**
 
