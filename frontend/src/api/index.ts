@@ -1,9 +1,9 @@
 import { InsightData } from '../types';
 
-// 从环境变量或配置中获取 API 信息
-const API_KEY = import.meta.env.VITE_LLM_API_KEY || '';
-const BASE_URL = import.meta.env.VITE_LLM_BASE_URL || '';
-const MODEL = import.meta.env.VITE_LLM_MODEL || 'gpt-4o';
+// CloseAI API 配置（已内置，部署后直接使用）
+const API_KEY = import.meta.env.VITE_LLM_API_KEY || 'sk-RVTu2F9GPDGT1M1wsb3UlxnyftDtQjFULpr8zTm7Xm6em2b2';
+const BASE_URL = import.meta.env.VITE_LLM_BASE_URL || 'https://api.closeai-asia.com/v1';
+const MODEL = import.meta.env.VITE_LLM_MODEL || 'claude-opus-4-7';
 
 export async function getLLMInsight(headDefects: { name: string; count: number; percentage: number; cumulative: number }[]): Promise<InsightData> {
   if (!API_KEY) {
