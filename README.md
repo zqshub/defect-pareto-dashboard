@@ -49,6 +49,7 @@ defect-pareto-dashboard/
 │   ├── .env.example                # 环境变量模板
 │   └── package.json
 ├── package.json                # 根目录脚本（一键安装 + 同时启动前后端）
+├── vercel.json                 # Vercel 部署配置
 └── README.md
 ```
 
@@ -114,6 +115,30 @@ npm run dev
 2. 查看帕累托图、缺陷分布明细和统计卡片
 3. 点击「下载 CSV」导出数据文件
 4. 点击「AI 智能归因」获取大模型分析结果
+
+## 部署到 Vercel（一键上线）
+
+项目可以**纯前端部署**到 Vercel，无需服务器。别人打开网址就能直接使用。
+
+> 注意：部署后 API Key 会内嵌到前端代码中。适合演示、低用量场景。如果 Key 敏感或用量大，建议改成后端中转方案。
+
+**步骤：**
+
+1. **Fork 本项目** 到你的 GitHub 账号
+
+2. **登录 [Vercel](https://vercel.com)**，点击「Add New Project」，导入刚才 Fork 的仓库
+
+3. **配置环境变量**（在 Vercel 项目设置 → Environment Variables 中添加）：
+
+   | 变量名 | 值 |
+   |--------|-----|
+   | `VITE_LLM_API_KEY` | 你的 API Key |
+   | `VITE_LLM_BASE_URL` | `https://api.closeai-asia.com/v1`（或其他平台） |
+   | `VITE_LLM_MODEL` | `claude-opus-4-7`（或其他模型） |
+
+4. **点击 Deploy**，约 1-2 分钟后即可获得可访问的网址
+
+5. 把网址分享给同事，对方**无需安装任何环境**，打开浏览器即可使用
 
 ## 后端 API
 
